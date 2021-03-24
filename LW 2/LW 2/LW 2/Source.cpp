@@ -1,6 +1,3 @@
-/*
- * C++ program to Implement AVL Tree
- */
 #include<iostream>
 #include<cstdio>
 #include<sstream>
@@ -8,13 +5,10 @@
 #include "BBST.h"
 using namespace std;
 
-/*
- * Main Contains Menu
- */
 int main()
 {
     int choice, item;
-    avlTree avl;
+    avlTree<char> avl;
     cout<<avl.isempty(root)<<endl;
     avl.display(root, 1);
     root = avl.insert(root, 1);
