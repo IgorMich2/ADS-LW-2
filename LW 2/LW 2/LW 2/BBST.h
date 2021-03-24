@@ -4,9 +4,9 @@
 #include<iostream>
 
 using namespace std;
-
+/*
 //Node Declaration
-
+//template< typename T >
 struct avl_node
 {
     int data;
@@ -28,7 +28,7 @@ public:
     avl_node* rl_rotation(avl_node*);
     avl_node* balance(avl_node*);
     avl_node* insert(avl_node*, int);
-    void display(avl_node*, int);
+
     void inorder(avl_node*);
     void preorder(avl_node*);
     void postorder(avl_node*);
@@ -40,31 +40,7 @@ public:
     }
 };
 
-// Height of AVL Tree
-template< typename T >
-int avlTree<T>::height(avl_node* temp)
-{
-    int h = 0;
-    if (temp != NULL)
-    {
-        int l_height = height(temp->left);
-        int r_height = height(temp->right);
-        int max_height = max(l_height, r_height);
-        h = max_height + 1;
-    }
-    return h;
-}
 
-
- //Height Difference
-template< typename T >
-int avlTree<T>::diff(avl_node* temp)
-{
-    int l_height = height(temp->left);
-    int r_height = height(temp->right);
-    int b_factor = l_height - r_height;
-    return b_factor;
-}
 
 
 // Right- Right Rotation
@@ -78,7 +54,7 @@ avl_node* avlTree<T>::rr_rotation(avl_node* parent)
     return temp;
 }
 
- // Left- Left Rotation
+// Left- Left Rotation
 template< typename T >
 avl_node* avlTree<T>::ll_rotation(avl_node* parent)
 {
@@ -101,7 +77,7 @@ avl_node* avlTree<T>::lr_rotation(avl_node* parent)
 }
 
 
- // Right- Left Rotation
+// Right- Left Rotation
 template< typename T >
 avl_node* avlTree<T>::rl_rotation(avl_node* parent)
 {
@@ -112,7 +88,7 @@ avl_node* avlTree<T>::rl_rotation(avl_node* parent)
 }
 
 
- //Balancing AVL Tree
+//Balancing AVL Tree
 template< typename T >
 avl_node* avlTree<T>::balance(avl_node* temp)
 {
@@ -134,7 +110,7 @@ avl_node* avlTree<T>::balance(avl_node* temp)
     return temp;
 }
 
- // Insert Element into the tree
+// Insert Element into the tree
 template< typename T >
 avl_node* avlTree<T>::insert(avl_node* root, int value)
 {
@@ -158,82 +134,7 @@ avl_node* avlTree<T>::insert(avl_node* root, int value)
     }
     return root;
 }
+*/
 
-
- // Display AVL Tree
-template< typename T >
-void avlTree<T>::display(avl_node* ptr, int level)
-{
-    int i;
-    if (ptr != NULL)
-    {
-        display(ptr->right, level + 1);
-        printf("\n");
-        if (ptr == root)
-            cout << "Root -> ";
-        for (i = 0; i < level && ptr != root; i++)
-            cout << "        ";
-        cout << ptr->data;
-        display(ptr->left, level + 1);
-    }
-}
-
-
- // Inorder Traversal of AVL Tree
-template< typename T >
-void avlTree<T>::inorder(avl_node* tree)
-{
-    if (tree == NULL)
-        return;
-    inorder(tree->left);
-    cout << tree->data << "  ";
-    inorder(tree->right);
-}
-
- // Preorder Traversal of AVL Tree
-template< typename T >
-void avlTree<T>::preorder(avl_node* tree)
-{
-    if (tree == NULL)
-        return;
-    cout << tree->data << "  ";
-    preorder(tree->left);
-    preorder(tree->right);
-
-}
-
-
- // Postorder Traversal of AVL Tree
-template< typename T >
-void avlTree<T>::postorder(avl_node* tree)
-{
-    if (tree == NULL)
-        return;
-    postorder(tree->left);
-    postorder(tree->right);
-    cout << tree->data << "  ";
-}
-
-// Postorder Traversal of AVL Tree
-template< typename T >
-bool avlTree<T>::isempty(avl_node* tree)
-{
-    if (tree == NULL)
-        return true;
-    else return false; 
-}
-template< typename T >
-void avlTree<T>::search(avl_node* tree, int el)
-{
-    if (tree == NULL) {
-        return;
-    }
-
-    search(tree->left, el);
-    if (el == tree->data) {
-        cout << "Element " << el << " is in the list" << "  ";
-    }
-    else search(tree->right, el);
-}
 
 #endif
