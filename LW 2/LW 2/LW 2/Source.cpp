@@ -87,6 +87,7 @@ public:
     int height2(AVLnode<T>* temp);
     int diff(AVLnode<T>* temp);
     void search(AVLnode<T>* tree, T el);
+    bool isfull(AVLnode<T>* tree);
 
 private:
     
@@ -319,6 +320,9 @@ void AVLtree<T>::display(AVLnode<T>* ptr, int level)
     }
 }
 
+
+
+
 template< typename T >
 void AVLtree<T>::inorder(AVLnode<T>* tree)
 {
@@ -359,6 +363,14 @@ bool AVLtree<T>::isempty(AVLnode<T>* tree)
 }
 
 template< typename T >
+bool AVLtree<T>::isfull(AVLnode<T>* tree)
+{
+    if (diff(tree) == 0)
+        return true;
+    else return false;
+}
+
+template< typename T >
 void AVLtree<T>::search(AVLnode<T>* tree, T el)
 {
     if (tree == NULL) {
@@ -378,8 +390,8 @@ int AVLtree<T>::height2(AVLnode<T>* temp)
     int h = 0;
     if (temp != NULL)
     {
-        int l_height = height(temp->left);
-        int r_height = height(temp->right);
+        int l_height = height2(temp->left);
+        int r_height = height2(temp->right);
         int max_height = max(l_height, r_height);
         h = max_height + 1;
     }
@@ -405,17 +417,29 @@ int main(void)
     t.insert(1);
     t.insert(2);
     t.insert(3);
+    t.insert(4);
+    t.display(t.root, 1);
+    cout << endl;
+
     t.inorder(t.root);
+    cout << endl;
     t.preorder(t.root);
+    cout << endl;
     t.postorder(t.root);
-    t.isempty(t.root);
+    cout << endl;
+    cout << t.isempty(t.root);
+    cout << endl;
     t.search(t.root, 1);
-    t.height2(t.root);
-    t.diff(t.root);
+    cout << endl;
+    cout <<"Height "<<  t.height2(t.root);
+    cout << endl;
+    cout << "Is full " << t.isfull(t.root);
+    cout << endl;
+    cout << "Diff " << t.diff(t.root);
+    cout << endl;
 
     t.printBalance();
     cout << endl;
-    t.display(t.root, 1);
 
 
     AVLtree<string> s;
@@ -426,6 +450,10 @@ int main(void)
     s.insert("cd");
 
     s.printBalance();
+    cout << endl;
+    cout << endl;
+    cout << endl;
+    cout << endl;
     cout << endl;
     s.display(s.root, 1);
 
