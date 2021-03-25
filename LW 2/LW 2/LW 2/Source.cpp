@@ -1,56 +1,7 @@
-/*#include<iostream>
-#include<cstdio>
-#include<sstream>
-#include<algorithm>
-#include "BBST.h"
-using namespace std;
 
-int main()
-{
-    int choice, item;
-    avlTree<char> avl;
-    cout << avl.isempty(root) << endl;
-    avl.display(root, 1);
-    root = avl.insert(root, 1);
-    root = avl.insert(root, 2);
-    root = avl.insert(root, 3);
-    root = avl.insert(root, 4);
-    root = avl.insert(root, 5);
-    root = avl.insert(root, 6);
-    root = avl.insert(root, 7);
-    root = avl.insert(root, 8);
-    root = avl.insert(root, 9);
-    root = avl.insert(root, 10);
-    root = avl.insert(root, 11);
-    root = avl.insert(root, 12);
-    root = avl.insert(root, 13);
-    root = avl.insert(root, 14);
-    root = avl.insert(root, 15);
-    root = avl.insert(root, 16);
-
-    avl.display(root, 1);
-    cout << endl;
-    avl.inorder(root);
-    cout << endl;
-    avl.preorder(root);
-    cout << endl;
-    avl.postorder(root);
-    cout << endl;
-    cout << avl.height(root);
-    cout << endl;
-    cout << avl.diff(root);
-    cout << endl;
-    cout << avl.isempty(root);
-    cout << endl;
-
-    avl.search(root, 123);
-    cout << endl;
-
-    return 0;
-}
-*/
 #include <algorithm>
 #include <iostream>
+#include <queue>
 using namespace std;
 /* AVL node */
 template <class T>
@@ -84,14 +35,13 @@ public:
     void preorder(AVLnode<T>* tree);
     void postorder(AVLnode<T>* tree);
     bool isempty(AVLnode<T>* tree);
+    bool isbalanced(AVLnode<T>* tree);
     int height2(AVLnode<T>* temp);
     int diff(AVLnode<T>* temp);
     void search(AVLnode<T>* tree, T el);
     bool isfull(AVLnode<T>* tree);
-
-private:
-    
-
+    int height3(AVLnode<T>* n);
+    int max(int a, int b);
     AVLnode<T>* rotateLeft(AVLnode<T>* a);
     AVLnode<T>* rotateRight(AVLnode<T>* a);
     AVLnode<T>* rotateLeftThenRight(AVLnode<T>* n);
@@ -100,6 +50,13 @@ private:
     int height(AVLnode<T>* n);
     void setBalance(AVLnode<T>* n);
     void printBalance(AVLnode<T>* n);
+    void reverseLevelOrder(AVLnode<T>* n);
+    void printGivenLevel(AVLnode<T>* n, int level);
+    unsigned int getfullCount(struct AVLnode<T>* node);
+    int sum(AVLnode<T>* root);
+    void deleteeven(AVLnode<T>* node);
+
+
 };
 
 /* AVL class definition */
@@ -127,6 +84,112 @@ void AVLtree<T>::rebalance(AVLnode<T>* n) {
         root = n;
     }
 }
+
+template <class T>
+void AVLtree<T>::reverseLevelOrder(AVLnode<T>* n)
+{
+    int h = height(root);
+    int i;
+    for (i = h+1; i >= 1; i--) //THE ONLY LINE DIFFERENT FROM NORMAL LEVEL ORDER 
+        printGivenLevel(n, i);
+}
+
+template <class T>
+void AVLtree<T>::deleteeven(AVLnode<T>* node)
+{
+    /*int h = height(root);
+    int i;
+    for (i = h + 1; i >= 1; i--) { //THE ONLY LINE DIFFERENT FROM NORMAL LEVEL ORDER 
+        if (node == NULL)
+            return;
+
+        AVLnode<T>
+            * n = node,
+            * parent = node,
+            * delNode = NULL,
+            * child = node;
+
+        while (child != NULL) {
+            parent = n;
+            n = child;
+            child = node >= n->key ? n->right : n->left;
+            if (node == n->key)
+                delNode = n;
+        }
+
+        if (delNode != NULL) {
+            delNode->key = n->key;
+
+            child = n->left != NULL ? n->left : n->right;
+
+            if (root->key == node) {
+                node = child;
+            }
+            else {
+                if (parent->left == n) {
+                    parent->left = child;
+                }
+                else {
+                    parent->right = child;
+                }
+
+                rebalance(parent);
+            }
+        }
+    }*/
+}
+
+
+/* Print nodes at a given level */
+template <class T>
+void AVLtree<T>::printGivenLevel(AVLnode<T>* n, int level)
+{
+    if (n == NULL)
+        return;
+    if (level == 1)
+        cout << n->key << " ";
+    else if (level > 1)
+    {
+        printGivenLevel(n->left, level - 1);
+        printGivenLevel(n->right, level - 1);
+    }
+}
+template <class T>
+int AVLtree<T>::sum(AVLnode<T>* root)
+{
+    if (root == NULL)
+        return 0;
+    return (root->key + sum(root->left) + sum(root->right));
+}
+
+
+template <class T>
+unsigned int AVLtree<T>::getfullCount(struct AVLnode<T>* node)
+{
+    // If tree is empty
+    if (!node)
+        return 0;
+    queue<AVLnode<T>*> q;
+
+    // Do level order traversal starting from root
+    int count = 0; // Initialize count of full nodes
+    q.push(node);
+    while (!q.empty())
+    {
+        struct AVLnode<T>* temp = q.front();
+        q.pop();
+
+        if (temp->left && temp->right)
+            count++;
+
+        if (temp->left != NULL)
+            q.push(temp->left);
+        if (temp->right != NULL)
+            q.push(temp->right);
+    }
+    return count;
+}
+
 
 template <class T>
 AVLnode<T>* AVLtree<T>::rotateLeft(AVLnode<T>* a) {
@@ -197,6 +260,26 @@ int AVLtree<T>::height(AVLnode<T>* n) {
     if (n == NULL)
         return -1;
     return 1 + std::max(height(n->left), height(n->right));
+}
+
+template <class T>
+int AVLtree<T>::max(int a, int b)
+{
+    return (a >= b) ? a : b;
+}
+
+template <class T>
+int AVLtree<T>::height3(AVLnode<T>* node)
+{
+    /* base case tree is empty */
+    if (node == NULL)
+        return 0;
+
+    /* If tree is not empty then
+    height = 1 + max of left
+        height and right heights */
+    return 1 + max(height(node->left),
+        height(node->right));
 }
 
 template <class T>
@@ -303,6 +386,10 @@ void AVLtree<T>::printBalance() {
     std::cout << std::endl;
 }
 
+
+
+
+
 template< typename T >
 void AVLtree<T>::display(AVLnode<T>* ptr, int level)
 {
@@ -363,6 +450,29 @@ bool AVLtree<T>::isempty(AVLnode<T>* tree)
 }
 
 template< typename T >
+bool AVLtree<T>::isbalanced(AVLnode<T>* tree)
+{
+   // int lh; /* for height of left subtree */
+   // int rh; /* for height of right subtree */
+
+    /* If tree is empty then return true */
+   // if (root == NULL)
+        return 1;
+
+    /* Get the height of left and right sub trees */
+   // lh = tree.diff(tree);
+
+   // if (abs(lh) <= 1 && isbalanced(tree))
+        return 1;
+        
+    /* If we reach here then
+    tree is not height-balanced */
+    return 0;
+}
+
+
+
+template< typename T >
 bool AVLtree<T>::isfull(AVLnode<T>* tree)
 {
     if (diff(tree) == 0)
@@ -418,7 +528,12 @@ int main(void)
     t.insert(2);
     t.insert(3);
     t.insert(4);
+    t.insert(5);
+    t.insert(6);
+    t.insert(7);
     t.display(t.root, 1);
+    cout << endl;
+    t.reverseLevelOrder(t.root);
     cout << endl;
 
     t.inorder(t.root);
@@ -440,7 +555,7 @@ int main(void)
 
     t.printBalance();
     cout << endl;
-
+    t.getfullCount(t.root);
 
     AVLtree<string> s;
 
@@ -456,6 +571,9 @@ int main(void)
     cout << endl;
     cout << endl;
     s.display(s.root, 1);
-
+    cout << t.isbalanced(t.root)<<endl;
+    cout << t.getfullCount(t.root)<<endl;
+    cout << t.sum(t.root) << endl;
+    t.deleteeven(t.root);
 
 }
