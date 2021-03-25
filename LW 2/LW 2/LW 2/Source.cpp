@@ -55,7 +55,9 @@ public:
     unsigned int getfullCount(struct AVLnode<T>* node);
     int sum(AVLnode<T>* root);
     void deleteeven(AVLnode<T>* node);
-
+    void secondLargestUtil(AVLnode<T>* root, int& c);
+    void secondLargest(AVLnode<T>* root);
+    
 
 };
 
@@ -386,9 +388,42 @@ void AVLtree<T>::printBalance() {
     std::cout << std::endl;
 }
 
+template <class T>
+void AVLtree<T>::secondLargestUtil(AVLnode<T>* root, int& c)
+{
+    // Base cases, the second condition is important to
+    // avoid unnecessary recursive calls
+    if (root == NULL || c >= 2)
+        return;
 
+    // Follow reverse inorder traversal so that the
+    // largest element is visited first
+    secondLargestUtil(root->right, c);
 
+    // Increment count of visited nodes
+    c++;
 
+    // If c becomes k now, then this is the 2nd largest
+    if (c == 2)
+    {
+        cout << "2nd largest element is "
+            << root->key << endl;
+        return;
+    }
+
+    // Recur for left subtree
+    secondLargestUtil(root->left, c);
+}
+template <class T>
+void AVLtree<T>::secondLargest(AVLnode<T>* root)
+{
+    // Initialize count of nodes visited as 0
+    int c = 0;
+
+    // Note that c is passed by reference
+    secondLargestUtil(root, c);
+
+}
 
 template< typename T >
 void AVLtree<T>::display(AVLnode<T>* ptr, int level)
@@ -575,5 +610,5 @@ int main(void)
     cout << t.getfullCount(t.root)<<endl;
     cout << t.sum(t.root) << endl;
     t.deleteeven(t.root);
-
+    t.secondLargest(t.root);
 }
