@@ -2,6 +2,7 @@
 #include <algorithm>
 #include <iostream>
 #include <queue>
+#include <unordered_set>
 using namespace std;
 /* AVL node */
 template <class T>
@@ -58,6 +59,12 @@ public:
     void secondLargestUtil(AVLnode<T>* root, int& c);
     void secondLargest(AVLnode<T>* root);
     int size(AVLnode<T>* node);
+    bool findPath(AVLnode<T>* root, vector<int>& path, int k);
+    T findLCA(AVLnode<T>* root, T n1, T n2);
+    void findParent(struct AVLnode<T>* node, T val, T parent);
+    void insertToHash(AVLnode<T>* root, unordered_set<int>& s);
+    bool checkBSTs(AVLnode<T>* root1, AVLnode<T>* root2);
+
 
 
 };
@@ -488,17 +495,17 @@ bool AVLtree<T>::isempty(AVLnode<T>* tree)
 template< typename T >
 bool AVLtree<T>::isbalanced(AVLnode<T>* tree)
 {
-   // int lh; /* for height of left subtree */
-   // int rh; /* for height of right subtree */
+    int lh; /* for height of left subtree */
+    int rh; /* for height of right subtree */
 
-    /* If tree is empty then return true */
-   // if (root == NULL)
+    //If tree is empty then return true
+    if (root == NULL)
         return 1;
 
     /* Get the height of left and right sub trees */
-   // lh = tree.diff(tree);
+    lh = diff(tree);
 
-   // if (abs(lh) <= 1 && isbalanced(tree))
+    if (abs(lh) <= 1 && isbalanced(tree))
         return 1;
         
     /* If we reach here then
@@ -560,7 +567,141 @@ int AVLtree<T>::diff(AVLnode<T>* temp)
     int b_factor = l_height - r_height;
     return b_factor;
 }
+template< typename T >
+void AVLtree<T>::findParent(struct AVLnode<T>* node, T val, T parent)
+{
+    if (node == NULL)
+        return;
 
+    // If current node is the required node
+    if (node->key == val) {
+
+        // Print its parent
+        cout << parent;
+    }
+    else {
+
+        // Recursive calls for the children
+        // of the current node
+        // Current node is now the new parent
+        findParent(node->left, val, node->key);
+        findParent(node->right, val, node->key);
+    }
+}
+
+
+template< typename T >
+void AVLtree<T>::insertToHash(AVLnode<T>* root, unordered_set<int>& s)
+{
+    if (!root)
+        return;
+    insertToHash(root->left, s);
+    s.insert(root->key);
+    insertToHash(root->right, s);
+}
+
+// function to check if the two BSTs contain
+// same set  of elements
+template< typename T >
+bool AVLtree<T>::checkBSTs(AVLnode<T>* root1, AVLnode<T>* root2)
+{
+    // Base cases 
+    if (!root1 && !root2)
+        return true;
+    if ((root1 && !root2) || (!root1 && root2))
+        return false;
+
+    // Create two hash sets and store 
+    // elements both BSTs in them.
+    unordered_set<int> s1, s2;
+    insertToHash(root1, s1);
+    insertToHash(root2, s2);
+
+    // Return true if both hash sets 
+    // contain same elements.
+    return (s1 == s2);
+}
+
+
+
+
+
+
+
+// Utility function creates a new binary tree node with given key
+
+
+// Finds the path from root node to given root of the tree, Stores the
+// path in a vector path[], returns true if path exists otherwise false
+template< typename T >
+bool AVLtree<T>::findPath(AVLnode<T>* root, vector<int>& path, int k)
+{
+    // base case
+    if (root == NULL) return false;
+
+    // Store this node in path vector. The node will be removed if
+    // not in path from root to k
+    path.push_back(root->key);
+
+    // See if the k is same as root's key
+    if (root->key == k)
+        return true;
+
+    // Check if k is found in left or right sub-tree
+    if ((root->left && findPath(root->left, path, k)) ||
+        (root->right && findPath(root->right, path, k)))
+        return true;
+
+    // If not present in subtree rooted with root, remove root from
+    // path[] and return false
+    path.pop_back();
+    return false;
+}
+
+// Returns LCA if node n1, n2 are present in the given binary tree,
+// otherwise return -1
+template< typename T >
+T AVLtree<T>::findLCA(AVLnode<T>* root, T n1, T n2)
+{
+    // to store paths to n1 and n2 from the root
+    vector<int> path1, path2;
+
+    // Find paths from root to n1 and root to n1. If either n1 or n2
+    // is not present, return -1
+    if (!findPath(root, path1, n1) || !findPath(root, path2, n2))
+        return -1;
+
+    /* Compare the paths to get the first different value */
+    int i;
+    for (i = 0; i < path1.size() && i < path2.size(); i++)
+        if (path1[i] != path2[i])
+            break;
+    return path1[i - 1];
+}
+
+
+
+
+template< typename T >
+bool identicalTrees(AVLnode<T>* a, AVLnode<T>* b)
+{
+    if (a == NULL && b == NULL)
+        return 1;
+
+    /* 2. both non-empty -> compare them */
+    if (a != NULL && b != NULL)
+    {
+        return
+            (
+                a->key == b->key &&
+                identicalTrees(a->left, b->left) &&
+                identicalTrees(a->right, b->right)
+                );
+    }
+
+    /* 3. one empty, one not -> false */
+    return 0;
+}
 
 int main(void)
 {
@@ -600,7 +741,7 @@ int main(void)
     cout << endl;
     t.getfullCount(t.root);
 
-    AVLtree<string> s;
+   /* AVLtree<string> s;
 
 
     s.insert("sa");
@@ -613,13 +754,31 @@ int main(void)
     cout << endl;
     cout << endl;
     cout << endl;
-    s.display(s.root, 1);
-    cout << t.isbalanced(t.root)<<endl;
+    s.display(s.root, 1);*/
+   // cout << t.isbalanced(t.root)<<endl;
     cout << t.getfullCount(t.root)<<endl;
     cout << t.sum(t.root) << endl;
     t.deleteeven(t.root);
     t.secondLargest(t.root);
     cout << endl;
-    cout<<t.size(t.root);
+    cout<<t.size(t.root)<<endl;
+    cout << t.findLCA(t.root, 1, 3)<<endl;
+    t.findParent(t.root, 1, -100000);
 
+
+
+    AVLtree<int> a;
+    AVLtree<int> b;
+    a.insert(1);
+    a.insert(2);
+    a.insert(3);
+    b.insert(1);
+    b.insert(2);
+    b.insert(3);
+
+    cout << endl << identicalTrees(a.root, b.root) << endl;
+    b.insert(4);
+    cout << identicalTrees(a.root, b.root) << endl;
+
+    cout<<a.checkBSTs(a.root, b.root);
 }
