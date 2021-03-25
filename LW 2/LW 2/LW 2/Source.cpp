@@ -57,7 +57,8 @@ public:
     void deleteeven(AVLnode<T>* node);
     void secondLargestUtil(AVLnode<T>* root, int& c);
     void secondLargest(AVLnode<T>* root);
-    
+    int size(AVLnode<T>* node);
+
 
 };
 
@@ -504,7 +505,14 @@ bool AVLtree<T>::isbalanced(AVLnode<T>* tree)
     tree is not height-balanced */
     return 0;
 }
-
+template< typename T >
+int AVLtree<T>::size(AVLnode<T>* node)
+{
+    if (node == NULL)
+        return 0;
+    else
+        return(size(node->left) + 1 + size(node->right));
+}
 
 
 template< typename T >
@@ -524,7 +532,7 @@ void AVLtree<T>::search(AVLnode<T>* tree, T el)
 
     search(tree->left, el);
     if (el == tree->key) {
-        cout << "Element " << el << " is in the list" << "  ";
+        cout << "Element " << el << " is in the tree" << "  ";
     }
     else search(tree->right, el);
 }
@@ -611,4 +619,7 @@ int main(void)
     cout << t.sum(t.root) << endl;
     t.deleteeven(t.root);
     t.secondLargest(t.root);
+    cout << endl;
+    cout<<t.size(t.root);
+
 }
