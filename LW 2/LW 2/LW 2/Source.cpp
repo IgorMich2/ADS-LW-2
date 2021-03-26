@@ -11,7 +11,8 @@ template <typename T>
     vector<T> a;
 template <typename T>
     vector<T> un;
-
+template <typename T>
+    vector<T> dup;
 template <class T>
 class AVLnode {
 public:
@@ -62,7 +63,7 @@ public:
     void reverseLevelOrder(AVLnode<T>* n);
     void printGivenLevel(AVLnode<T>* n, int level);
     unsigned int getfullCount(struct AVLnode<T>* node);
-    int sumkeys(AVLnode<T>* root);
+    T sumkeys(AVLnode<T>* root);
     void deleteeven(AVLnode<T>* node);
     void secondLargestUtil(AVLnode<T>* root, int& c);
     void secondLargest(AVLnode<T>* root);
@@ -72,13 +73,13 @@ public:
     void findParent(struct AVLnode<T>* node, T val, T parent);
     void insertToHash(AVLnode<T>* root, unordered_set<int>& s);
     bool checkBSTs(AVLnode<T>* root1, AVLnode<T>* root2);
-    int findMedian(struct AVLnode<T>* root);
+    T findMedian(struct AVLnode<T>* root);
     int counNodes(struct AVLnode<T>* root);
     void PrintSorted(struct AVLnode<T>* node, int n);
     void inserttrees(AVLnode<T>* a, AVLnode<T>* b, int n);
-    void tovector(AVLnode<T>* b);
     bool identicalTrees(AVLnode<T>* a, AVLnode<T>* b);
-
+    bool SymmetricalBBST(struct AVLnode<T>* root1, struct AVLnode<T>* root2);
+    void deleteduplicates(struct AVLnode<T>* root1);
 
 };
 
@@ -139,7 +140,7 @@ void AVLtree<T>::printGivenLevel(AVLnode<T>* n, int level)
 }
 
 template <class T>
-int AVLtree<T>::sumkeys(AVLnode<T>* root)
+T AVLtree<T>::sumkeys(AVLnode<T>* root)
 {
     if (root == NULL)
         return 0;
@@ -638,7 +639,35 @@ int AVLtree<T>::counNodes(struct AVLnode<T>* root)
 }
 
 template< typename T >
-int AVLtree<T>::findMedian(struct AVLnode<T>* root)
+bool AVLtree<T>::SymmetricalBBST(struct AVLnode<T>* root1, struct AVLnode<T>* root2)
+{
+    if (root1 == NULL && root2 == NULL)
+        return true;
+
+    if (root1 && root2 && root1->key == root2->key)
+        return isMirror(root1->left, root2->right)
+        && isMirror(root1->right, root2->left);
+
+    return false;
+}
+
+template< typename T >
+void AVLtree<T>::deleteduplicates(struct AVLnode<T>* root1)
+{
+    if (root1 == NULL)
+        return;
+    postorder(root1->left);
+    postorder(root1->right);
+    dup.push_back();
+    dup.erase(unique(dup.begin(), dup.end()), dup.end());
+    deleteeven(root1);
+    for (int i = 0; i < dup<T>.size(); i++) {
+        insert(dup[i]);
+    }
+}
+
+template< typename T >
+T AVLtree<T>::findMedian(struct AVLnode<T>* root)
 {
     if (root == NULL)
         return 0;
@@ -750,12 +779,6 @@ bool AVLtree<T>::identicalTrees(AVLnode<T>* a, AVLnode<T>* b)
     return 0;
 }
 
-
-template< typename T >
-void AVLtree<T>::tovector(AVLnode<T>* b)
-{
-    
-}
 
 template< typename T >
 void AVLtree<T>::inserttrees(AVLnode<T>* A, AVLnode<T>* b, int n)
