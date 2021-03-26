@@ -2,10 +2,13 @@
 #include <algorithm>
 #include <iostream>
 #include <queue>
+#include <vector>
 #include <unordered_set>
 #include <unordered_map>
 using namespace std;
-/* AVL node */
+
+template <typename T>
+vector<T> a;
 template <class T>
 class AVLnode {
 public:
@@ -22,7 +25,7 @@ public:
     }
 };
 
-/* AVL tree */
+
 template <class T>
 class AVLtree {
 public:
@@ -33,24 +36,22 @@ public:
     void printBalance();
     void display(AVLnode<T>* ptr, int level);
     AVLnode<T>* root;
-
-
+    AVLnode<T>* newNode(int key);
+        AVLnode<T>* copyLeftRightNode(AVLnode<T>* treeNode, unordered_map<AVLnode<T>*, AVLnode<T>*>& mymap);
     void inorder(AVLnode<T>* tree);
     void preorder(AVLnode<T>* tree);
     void postorder(AVLnode<T>* tree);
     bool isempty(AVLnode<T>* tree);
     bool isbalanced(AVLnode<T>* tree);
-    int height2(AVLnode<T>* temp);
     int diff(AVLnode<T>* temp);
     void search(AVLnode<T>* tree, T el);
     bool isfull(AVLnode<T>* tree);
-    int height3(AVLnode<T>* n);
     int max(int a, int b);
     AVLnode<T>* rotateLeft(AVLnode<T>* a);
     AVLnode<T>* rotateRight(AVLnode<T>* a);
     AVLnode<T>* rotateLeftThenRight(AVLnode<T>* n);
     AVLnode<T>* rotateRightThenLeft(AVLnode<T>* n);
-    AVLnode<T>* cloneTree(AVLnode<T>* tree);
+    AVLnode<T>* copyTree(AVLnode<T>* tree);
     void rebalance(AVLnode<T>* n);
     int height(AVLnode<T>* n);
     void setBalance(AVLnode<T>* n);
@@ -70,11 +71,10 @@ public:
     bool checkBSTs(AVLnode<T>* root1, AVLnode<T>* root2);
     int findMedian(struct AVLnode<T>* root);
     int counNodes(struct AVLnode<T>* root);
+    void PrintSorted(struct AVLnode<T>* node, int n);
 
 };
 
-
-/* AVL class definition */
 template <class T>
 void AVLtree<T>::rebalance(AVLnode<T>* n) {
     setBalance(n);
@@ -105,7 +105,7 @@ void AVLtree<T>::reverseLevelOrder(AVLnode<T>* n)
 {
     int h = height(root);
     int i;
-    for (i = h+1; i >= 1; i--) //THE ONLY LINE DIFFERENT FROM NORMAL LEVEL ORDER 
+    for (i = h+1; i >= 1; i--)
         printGivenLevel(n, i);
 }
 
@@ -117,8 +117,6 @@ void AVLtree<T>::deleteeven(AVLnode<T>* node)
     node->key = NULL;
 }
 
-
-/* Print nodes at a given level */
 template <class T>
 void AVLtree<T>::printGivenLevel(AVLnode<T>* n, int level)
 {
@@ -132,6 +130,7 @@ void AVLtree<T>::printGivenLevel(AVLnode<T>* n, int level)
         printGivenLevel(n->right, level - 1);
     }
 }
+
 template <class T>
 int AVLtree<T>::sumkeys(AVLnode<T>* root)
 {
@@ -140,17 +139,14 @@ int AVLtree<T>::sumkeys(AVLnode<T>* root)
     return (root->key + sumkeys(root->left) + sumkeys(root->right));
 }
 
-
 template <class T>
 unsigned int AVLtree<T>::getfullCount(struct AVLnode<T>* node)
 {
-    // If tree is empty
     if (!node)
         return 0;
     queue<AVLnode<T>*> q;
 
-    // Do level order traversal starting from root
-    int count = 0; // Initialize count of full nodes
+    int count = 0;
     q.push(node);
     while (!q.empty())
     {
@@ -167,9 +163,28 @@ unsigned int AVLtree<T>::getfullCount(struct AVLnode<T>* node)
     }
     return count;
 }
+template <class T>
+AVLnode<T>* AVLtree<T>::newNode(int key)
+{
+    AVLnode<T>* temp = new AVLnode<T>(key, NULL);
+    temp->key = key;
+    temp->right = temp->left = NULL;
+    return (temp);
+}
+template <class T>
+AVLnode<T>* AVLtree<T>::copyLeftRightNode(AVLnode<T>* treeNode, unordered_map<AVLnode<T>*, AVLnode<T>*>& mymap)
+{
+    if (treeNode == NULL)
+        return NULL;
+    AVLnode<T>* cloneNode = newNode(treeNode->key);
+    mymap[treeNode] = cloneNode;
+    cloneNode->left = copyLeftRightNode(treeNode->left, mymap);
+    cloneNode->right = copyLeftRightNode(treeNode->right, mymap);
+    return cloneNode;
+}
 
 template <class T>
-AVLnode<T>* AVLtree<T>::cloneTree(AVLnode<T>* tree)
+AVLnode<T>* AVLtree<T>::copyTree(AVLnode<T>* tree)
 {
     if (tree == NULL)
         return NULL;
@@ -255,19 +270,6 @@ int AVLtree<T>::max(int a, int b)
     return (a >= b) ? a : b;
 }
 
-template <class T>
-int AVLtree<T>::height3(AVLnode<T>* node)
-{
-    /* base case tree is empty */
-    if (node == NULL)
-        return 0;
-
-    /* If tree is not empty then
-    height = 1 + max of left
-        height and right heights */
-    return 1 + max(height(node->left),
-        height(node->right));
-}
 
 template <class T>
 void AVLtree<T>::setBalance(AVLnode<T>* n) {
@@ -376,19 +378,13 @@ void AVLtree<T>::printBalance() {
 template <class T>
 void AVLtree<T>::secondLargestUtil(AVLnode<T>* root, int& c)
 {
-    // Base cases, the second condition is important to
-    // avoid unnecessary recursive calls
     if (root == NULL || c >= 2)
         return;
 
-    // Follow reverse inorder traversal so that the
-    // largest element is visited first
     secondLargestUtil(root->right, c);
 
-    // Increment count of visited nodes
     c++;
 
-    // If c becomes k now, then this is the 2nd largest
     if (c == 2)
     {
         cout << "2nd largest element is "
@@ -396,18 +392,14 @@ void AVLtree<T>::secondLargestUtil(AVLnode<T>* root, int& c)
         return;
     }
 
-    // Recur for left subtree
     secondLargestUtil(root->left, c);
 }
 template <class T>
 void AVLtree<T>::secondLargest(AVLnode<T>* root)
 {
-    // Initialize count of nodes visited as 0
     int c = 0;
 
-    // Note that c is passed by reference
     secondLargestUtil(root, c);
-
 }
 
 template< typename T >
@@ -522,19 +514,26 @@ void AVLtree<T>::search(AVLnode<T>* tree, T el)
 }
 
 template< typename T >
-int AVLtree<T>::height2(AVLnode<T>* temp)
+void AVLtree<T>::PrintSorted(struct AVLnode<T>* tree, int n)
 {
-    int h = 0;
-    if (temp != NULL)
-    {
-        int l_height = height2(temp->left);
-        int r_height = height2(temp->right);
-        int max_height = max(l_height, r_height);
-        h = max_height + 1;
+    int t = counNodes(tree);
+    
+    if (tree == NULL)
+        return;
+    PrintSorted(tree->left, n);
+    cout << tree->key << "  ";
+    a<T>.push_back(tree->key);
+    PrintSorted(tree->right, n);
+    
+    if (a<T>.size() == n) {
+        cout << endl;
+        for (int i = a<T>.size() - 1; i >= 0; i--) {
+            cout << a<T>[i] << "  ";
+        }
+        a<T>.push_back(tree->key);
+        return;
     }
-    return h;
 }
-
 
 template< typename T >
 int AVLtree<T>::diff(AVLnode<T>* temp)
@@ -550,17 +549,11 @@ void AVLtree<T>::findParent(struct AVLnode<T>* node, T val, T parent)
     if (node == NULL)
         return;
 
-    // If current node is the required node
     if (node->key == val) {
 
-        // Print its parent
         cout << parent;
     }
     else {
-
-        // Recursive calls for the children
-        // of the current node
-        // Current node is now the new parent
         findParent(node->left, val, node->key);
         findParent(node->right, val, node->key);
     }
@@ -577,25 +570,18 @@ void AVLtree<T>::insertToHash(AVLnode<T>* root, unordered_set<int>& s)
     insertToHash(root->right, s);
 }
 
-// function to check if the two BSTs contain
-// same set  of elements
 template< typename T >
 bool AVLtree<T>::checkBSTs(AVLnode<T>* root1, AVLnode<T>* root2)
 {
-    // Base cases 
     if (!root1 && !root2)
         return true;
     if ((root1 && !root2) || (!root1 && root2))
         return false;
 
-    // Create two hash sets and store 
-    // elements both BSTs in them.
     unordered_set<int> s1, s2;
     insertToHash(root1, s1);
     insertToHash(root2, s2);
 
-    // Return true if both hash sets 
-    // contain same elements.
     return (s1 == s2);
 }
 template< typename T >
@@ -603,7 +589,6 @@ int AVLtree<T>::counNodes(struct AVLnode<T>* root)
 {
     struct AVLnode<T>* current, * pre;
 
-    // Initialise count of nodes as 0
     int count = 0;
 
     if (root == NULL)
@@ -614,49 +599,37 @@ int AVLtree<T>::counNodes(struct AVLnode<T>* root)
     {
         if (current->left == NULL)
         {
-            // Count node if its left is NULL
             count++;
 
-            // Move to its right
             current = current->right;
         }
         else
         {
-            /* Find the inorder predecessor of current */
             pre = current->left;
 
             while (pre->right != NULL &&
                 pre->right != current)
                 pre = pre->right;
 
-            /* Make current as right child of its
-               inorder predecessor */
             if (pre->right == NULL)
             {
                 pre->right = current;
                 current = current->left;
             }
 
-            /* Revert the changes made in if part to
-               restore the original tree i.e., fix
-               the right child of predecssor */
             else
             {
                 pre->right = NULL;
 
-                // Increment count if the current
-                // node is to be visited
                 count++;
                 current = current->right;
-            } /* End of if condition pre->right == NULL */
-        } /* End of if condition current->left == NULL*/
-    } /* End of while */
+            }
+        } 
+    }
 
     return count;
 }
 
-/* Function to find median in O(n) time and O(1) space
-   using Morris Inorder traversal*/
 template< typename T >
 int AVLtree<T>::findMedian(struct AVLnode<T>* root)
 {
@@ -672,113 +645,78 @@ int AVLtree<T>::findMedian(struct AVLnode<T>* root)
         if (current->left == NULL)
         {
             prev = current;
-            // count current node
             currCount++;
 
-            // check if current node is the median
-            // Odd case
             if (count % 2 != 0 && currCount == (count + 1) / 2)
                 return prev->key;
 
-            // Even case
             else if (count % 2 == 0 && currCount == (count / 2) + 1)
                 return (prev->key + current->key) / 2;
 
-            // Update prev for even no. of nodes
             prev = current;
 
-            //Move to the right
             current = current->right;
         }
         else
         {
-            /* Find the inorder predecessor of current */
             pre = current->left;
             while (pre->right != NULL && pre->right != current)
                 pre = pre->right;
 
-            /* Make current as right child of its inorder predecessor */
             if (pre->right == NULL)
             {
                 pre->right = current;
                 current = current->left;
             }
 
-            /* Revert the changes made in if part to restore the original
-              tree i.e., fix the right child of predecssor */
             else
             {
                 pre->right = NULL;
 
                 prev = pre;
 
-                // Count current node
                 currCount++;
 
-                // Check if the current node is the median
                 if (count % 2 != 0 && currCount == (count + 1) / 2)
                     return current->key;
 
                 else if (count % 2 == 0 && currCount == (count / 2) + 1)
                     return (prev->key + current->key) / 2;
 
-                // update prev node for the case of even
-                // no. of nodes
                 prev = current;
                 current = current->right;
 
-            } /* End of if condition pre->right == NULL */
-        } /* End of if condition current->left == NULL*/
-    } /* End of while */
+            }
+        }
+    }
 }
 
-
-
-
-// Utility function creates a new binary tree node with given key
-
-
-// Finds the path from root node to given root of the tree, Stores the
-// path in a vector path[], returns true if path exists otherwise false
 template< typename T >
 bool AVLtree<T>::findPath(AVLnode<T>* root, vector<int>& path, int k)
 {
-    // base case
     if (root == NULL) return false;
 
-    // Store this node in path vector. The node will be removed if
-    // not in path from root to k
     path.push_back(root->key);
 
-    // See if the k is same as root's key
     if (root->key == k)
         return true;
 
-    // Check if k is found in left or right sub-tree
     if ((root->left && findPath(root->left, path, k)) ||
         (root->right && findPath(root->right, path, k)))
         return true;
 
-    // If not present in subtree rooted with root, remove root from
-    // path[] and return false
     path.pop_back();
     return false;
 }
 
-// Returns LCA if node n1, n2 are present in the given binary tree,
-// otherwise return -1
 template< typename T >
 T AVLtree<T>::findLCA(AVLnode<T>* root, T n1, T n2)
 {
-    // to store paths to n1 and n2 from the root
     vector<int> path1, path2;
 
-    // Find paths from root to n1 and root to n1. If either n1 or n2
-    // is not present, return -1
     if (!findPath(root, path1, n1) || !findPath(root, path2, n2))
         return -1;
 
-    /* Compare the paths to get the first different value */
     int i;
     for (i = 0; i < path1.size() && i < path2.size(); i++)
         if (path1[i] != path2[i])
@@ -786,16 +724,12 @@ T AVLtree<T>::findLCA(AVLnode<T>* root, T n1, T n2)
     return path1[i - 1];
 }
 
-
-
-
 template< typename T >
 bool identicalTrees(AVLnode<T>* a, AVLnode<T>* b)
 {
     if (a == NULL && b == NULL)
         return 1;
 
-    /* 2. both non-empty -> compare them */
     if (a != NULL && b != NULL)
     {
         return
@@ -806,7 +740,6 @@ bool identicalTrees(AVLnode<T>* a, AVLnode<T>* b)
                 );
     }
 
-    /* 3. one empty, one not -> false */
     return 0;
 }
 
@@ -839,7 +772,7 @@ int main(void)
     cout << endl;
     t.search(t.root, 1);
     cout << endl;
-    cout <<"Height "<<  t.height2(t.root);
+    cout <<"Height "<<  t.height(t.root);
     cout << endl;
     cout << "Is full " << t.isfull(t.root);
     cout << endl;
@@ -850,8 +783,8 @@ int main(void)
     cout << endl;
     t.getfullCount(t.root);
 
-   /* AVLtree<string> s;
-
+    //string
+    AVLtree<string> s;
 
     s.insert("sa");
     s.insert("ab");
@@ -863,7 +796,7 @@ int main(void)
     cout << endl;
     cout << endl;
     cout << endl;
-    s.display(s.root, 1);*/
+    s.display(s.root, 1);
  
     cout << t.getfullCount(t.root)<<endl;
     cout << t.sumkeys(t.root) << endl;
@@ -873,9 +806,11 @@ int main(void)
     cout<<t.size(t.root)<<endl;
     cout << t.findLCA(t.root, 1, 3)<<endl;
     t.findParent(t.root, 1, -100000);
-
-
-
+    cout << endl;
+    cout << endl;
+    int n = t.counNodes(t.root);
+    t.PrintSorted(t.root, n);
+    cout << endl;
     AVLtree<int> a;
     AVLtree<int> b;
     AVLtree<int> c;
@@ -885,7 +820,8 @@ int main(void)
     b.insert(1);
     b.insert(2);
     b.insert(3);
-
+    c.copyTree(a.root);
+    a.display(a.root, 1);
     cout << endl << identicalTrees(a.root, b.root) << endl;
     b.insert(4);
     cout << identicalTrees(a.root, b.root) << endl;
@@ -893,7 +829,7 @@ int main(void)
     cout<<a.checkBSTs(a.root, b.root)<<endl;
 
     cout << a.findMedian(a.root);
-    
+
     a.deleteeven(a.root);
 
 }
