@@ -849,13 +849,10 @@ int main(void)
     s.insert("cd");
 
     s.printBalance();
-    cout << endl;
-    cout << endl;
-    cout << endl;
-    cout << endl;
-    cout << endl;
+
+
     s.display(s.root, 1);
- 
+    cout << endl;
     cout << t.getfullCount(t.root)<<endl;
     cout << t.sumkeys(t.root) << endl;
     
@@ -892,5 +889,18 @@ int main(void)
     cout << a.findMedian(a.root);
 
     a.deleteeven(a.root);
+
+
+    AVLtree<bool> f;
+    f.insert(1);
+    f.insert(0);
+    f.display(f.root, 1);
+
+    AVLtree<char> g;
+    g.insert('a');
+    g.insert('t');
+    g.insert('s');
+    g.insert('d');
+    g.display(g.root, 1);
 
 }
