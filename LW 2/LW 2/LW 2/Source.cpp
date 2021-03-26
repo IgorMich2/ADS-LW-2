@@ -8,7 +8,10 @@
 using namespace std;
 
 template <typename T>
-vector<T> a;
+    vector<T> a;
+template <typename T>
+    vector<T> un;
+
 template <class T>
 class AVLnode {
 public:
@@ -72,6 +75,10 @@ public:
     int findMedian(struct AVLnode<T>* root);
     int counNodes(struct AVLnode<T>* root);
     void PrintSorted(struct AVLnode<T>* node, int n);
+    void inserttrees(AVLnode<T>* a, AVLnode<T>* b, int n);
+    void tovector(AVLnode<T>* b);
+    bool identicalTrees(AVLnode<T>* a, AVLnode<T>* b);
+
 
 };
 
@@ -725,7 +732,7 @@ T AVLtree<T>::findLCA(AVLnode<T>* root, T n1, T n2)
 }
 
 template< typename T >
-bool identicalTrees(AVLnode<T>* a, AVLnode<T>* b)
+bool AVLtree<T>::identicalTrees(AVLnode<T>* a, AVLnode<T>* b)
 {
     if (a == NULL && b == NULL)
         return 1;
@@ -743,6 +750,34 @@ bool identicalTrees(AVLnode<T>* a, AVLnode<T>* b)
     return 0;
 }
 
+
+template< typename T >
+void AVLtree<T>::tovector(AVLnode<T>* b)
+{
+    
+}
+
+template< typename T >
+void AVLtree<T>::inserttrees(AVLnode<T>* A, AVLnode<T>* b, int n)
+{
+    int t = counNodes(b);
+
+    if (b == NULL)
+        return;
+    inserttrees(A, b->left, n);
+    cout << b->key << "  ";
+    un<T>.push_back(b->key);
+    inserttrees(A, b->right, n);
+
+    if (un<T>.size() == n) {
+        for (int i = un<T>.size() - 1; i >= 0; i--) {
+            insert(un<T>[i]);
+        }
+        un<T>.push_back(b->key);
+        return;
+    }
+
+}
 
 
 int main(void)
@@ -822,9 +857,12 @@ int main(void)
     b.insert(3);
     c.copyTree(a.root);
     a.display(a.root, 1);
-    cout << endl << identicalTrees(a.root, b.root) << endl;
+    cout << endl << a.identicalTrees(a.root, b.root) << endl;
     b.insert(4);
-    cout << identicalTrees(a.root, b.root) << endl;
+
+    a.inserttrees(a.root, b.root, 0);
+
+    cout << a.identicalTrees(a.root, b.root) << endl;
 
     cout<<a.checkBSTs(a.root, b.root)<<endl;
 
